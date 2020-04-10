@@ -75,26 +75,20 @@ int main(void)
         //       Check the transmit interrupt flag prior to transmitting each character and moving on to the next one.
         //       Make sure to reset the success variable after transmission.
 
-            /* From my homework one.
+        if (finished == true){
+        {
             int index;
 
-            for(index = 0; response[index] == 0; index++) {
-                if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG){
-                    UART_transmitData(EUSCI_A0_BASE,*response);
-                    UART_receiveData(EUSCI_A0_BASE);
-                }
-                rChar = false;
+            for(index = 0; response[index] == 0; index++){
+               if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG){
+                   UART_transmitData(EUSCI_A0_BASE, *response);
+               }
             }
 
-            //if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG);
-          /* {
-               UART_transmitData(EUSCI_A0_BASE,*response);
-               UART_receiveData(EUSCI_A0_BASE);
-               //charFSM == false;
-           }*/
-
         }
-
+finished = false;
+    }
+    }
 
 
 }
@@ -157,5 +151,6 @@ bool charFSM(char rChar)
         }
 
     }
+    finished = true;
     return finished;
 }
