@@ -74,19 +74,29 @@ int main(void)
         // TODO: If the FSM indicates a successful string entry, transmit the response string.
         //       Check the transmit interrupt flag prior to transmitting each character and moving on to the next one.
         //       Make sure to reset the success variable after transmission.
-        if (charFSM == false)
-        {
-           if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG);
-           {
+
+            /* From my homework one.
+            int index;
+
+            for(index = 0; response[index] == 0; index++) {
+                if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG){
+                    UART_transmitData(EUSCI_A0_BASE,*response);
+                    UART_receiveData(EUSCI_A0_BASE);
+                }
+                rChar = false;
+            }
+
+            //if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG);
+          /* {
                UART_transmitData(EUSCI_A0_BASE,*response);
                UART_receiveData(EUSCI_A0_BASE);
                //charFSM == false;
-           }
+           }*/
 
         }
 
 
-    }
+
 }
 
 void initBoard()
@@ -97,6 +107,8 @@ void initBoard()
 // TODO: FSM for detecting character sequence.
 bool charFSM(char rChar)
 {
+    bool finished = false;
+
     typedef enum {Start, Two, Five, Three, Four} startState;{
         static int startState = Start;
 
@@ -117,14 +129,14 @@ bool charFSM(char rChar)
             break;
 
         case Five:
-            if (rChar == '3' && (startState == Five && startState != Start))
+            if (rChar == '3' && (startState == Five || startState == Start))
                 startState = Four;
             else
                 startState = Start;
             break;
 
         case Three:
-            if (rChar == '4' && (startState == Three && startState != (Start | Four))){
+            if (rChar == '4' && (startState == Three || startState == Start)){
                 startState = Four;
             }
             else{
@@ -133,12 +145,17 @@ bool charFSM(char rChar)
             break;
 
         case Four:
-            startState = Start;
+            if (startState == Four){
+                finished = true;
+                //startState = Start;
+            }
+            else{
+                startState = Start;
+            }
             break;
 
         }
 
     }
-    bool finished = false;
     return finished;
 }
