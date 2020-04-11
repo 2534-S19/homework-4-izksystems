@@ -1,13 +1,15 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "homework4.h"
 
+
 int main(void)
 {
     char rChar;
     char *response = "\n\n\r2534 is the best course in the curriculum!\r\n\n";
 
     // TODO: Declare the variables that main uses to interact with your state machine.
-    bool finished = false;
+    bool finished = false;  //sequenceSucess();
+
 
     // Stops the Watchdog timer.
     initBoard();
@@ -74,20 +76,23 @@ int main(void)
         // TODO: If the FSM indicates a successful string entry, transmit the response string.
         //       Check the transmit interrupt flag prior to transmitting each character and moving on to the next one.
         //       Make sure to reset the success variable after transmission.
+//charFSM(finished);
+        if (rChar == '4'){
 
-        if (finished == true){
-        {
-            int index;
-
-            for(index = 0; response[index] == 0; index++){
-               if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG){
-                   UART_transmitData(EUSCI_A0_BASE, *response);
-               }
+        while(*response != 0)
+            {
+            //if (UART_getInterruptStatus(EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) {
+                        //                         (uint32_t moduleInstance,uint8_t mask);
+                        UART_transmitData(EUSCI_A0_BASE, *response);
+                        //               (uint32_t moduleInstance,uint_fast8_t transmitData);
+                        //}
+                response++;
             }
-
+            //*response = 0;
         }
-finished = false;
-    }
+
+
+
     }
 
 
@@ -105,7 +110,7 @@ bool charFSM(char rChar)
 
     typedef enum {Start, Two, Five, Three, Four} startState;{
         static int startState = Start;
-
+        //bool finished = false;
         switch (startState){
 
         case Start:
@@ -123,14 +128,14 @@ bool charFSM(char rChar)
             break;
 
         case Five:
-            if (rChar == '3' && (startState == Five || startState == Start))
+            if (rChar == '3' && startState == Five)
                 startState = Four;
             else
                 startState = Start;
             break;
 
         case Three:
-            if (rChar == '4' && (startState == Three || startState == Start)){
+            if (rChar == '4' && startState == Three){
                 startState = Four;
             }
             else{
@@ -140,17 +145,24 @@ bool charFSM(char rChar)
 
         case Four:
             if (startState == Four){
-                finished = true;
                 //startState = Start;
+                finished = true;
             }
             else{
                 startState = Start;
             }
             break;
-
         }
-
     }
-    finished = true;
-    return finished;
+
+
+    if (finished && (rChar == '4')){
+
+
+        return (finished = true);
+    }
+
+        return finished;
 }
+
+
